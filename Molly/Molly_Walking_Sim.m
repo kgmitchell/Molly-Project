@@ -1,49 +1,53 @@
-%% Kyle Mitchell
-% RBE 521 Final Exam
-
 close all; clear all; clc;
 
 % Booleans to toggle plotting
-plot_6_step_pos_and_vel = true; % Needs to be true for part 6
-plot_11_step_pos_and_vel = true;
-plot_transfer_a_b_g = true;
+plot_6_step_pos_and_vel = false; % Needs to be true for part 6
+plot_11_step_pos_and_vel = false;
+plot_transfer_a_b_g = false;
 
-plot_cycle_pos = true; 
-plot_cycle_a_b_g = true; % Needs to be true for part 7
-plot_cycle_joint_velocities = true; % Needs to be true for part 8
+plot_cycle_pos = false; 
+plot_cycle_a_b_g = false; % Needs to be true for part 7
+plot_cycle_joint_velocities = false; % Needs to be true for part 8
 
 plot_simulation = true; % Needs to be true for part 9
 %% Problem 1
 
 % From HW 6 and problem statement:
-v = 0.01; % m/s
-duty = 4/6;
-L = 0.030; % m
-leg_lengths = [0, 0.050, 0.100]; % m
-liftoff_height = 0.005; % m
-body_height = 0.1; % m
+v = 0.01; % m/s (Average Constant Forward Velocity)
+duty = 4/6; % (Duty Factor - ratio of number of legs on the gorund at a time)
+L = 0.030; % m (Stride Length)
+leg_lengths = [0, 0.050, 0.100]; % m (Length of each segment of each leg)
+liftoff_height = 0.005; % m (Height a leg lifts off of the ground while in swing phase)
+body_height = 0.1; % m (Height of body above ground - theoretically remains constant in this setting)
 body_l = 0.4; % m
 body_w = 0.2; % m
 body_h = 0.1; % m
-D = leg_lengths(1) + leg_lengths(2) + (body_w/2);
+D = leg_lengths(1) + leg_lengths(2) + (body_w/2); % (Distance from foot tip to center of body from top view in standard position)
 
-% Q1
+% Q1: Average Velocity of Swing Phase Legs wrt the Body
 u_fb = duty / (1 - duty) * v; % m/s
 
-% Q2
+% Q2: Average Velocity of Swing Phase Legs wrt the Ground
 u_fg = v / (1 - duty); % m/s
 
-% Q3
-num_contact_legs = 4;
+% Q3: Number of Legs in Support Phase when Walking (Based on Phase Diagram)
+num_contact_legs = 4; 
 
-% Q4
+% Q4: Relative Kinematic Phase for Each Leg
 phi_start = [4/6, 1/6, 2/6, 5/6, 0/6, 3/6]; % start of transfer phase
 phi_end = [0/6, 3/6, 4/6, 1/6, 2/6, 5/6]; % end of transfer phase
 
-% Q5
+% Q5: Length of One Cycle Time Period
 T = L / v; % sec
 
-%% Q6
+%% Q6:
+%{ 
+Calculate the transfer time (swing period). Then, for a single leg, consider identical time intervals
+with time steps of [𝑡1 𝑡2 𝑡3 𝑡4 𝑡5 𝑡6] within the transfer time, where 𝑡1 is the lift-up and
+𝑡6 is the touchdown time. Then draw horizontal and vertical position and velocity of foot tip with
+respect to the time in ground coordinate system. Show all numbers on the axes of the graphs.
+%}
+
 T_s = T * duty; % support time (sec)
 T_t = T - T_s; % transfer time (sec)
 
@@ -156,7 +160,10 @@ if plot_6_step_pos_and_vel
         text(thisX, thisY, labelstr);
     end
 end
-%% Q7
+%% Q7:
+%{
+Calculate positions of all 18 joints at all intervals.
+%}
 
 % REDEFINE TRAJECTORIES WITH MORE TIME STEPS TO BE MORE FRIENDLY WITH THE
 % RELATIVE KINEMATIC PHASE OF EACH LEG (0.2 STEPS WERE TOO BIG, 0.1 OK)
@@ -420,7 +427,10 @@ if plot_cycle_a_b_g
     end
 end
 
-%% Q8
+%% Q8:
+%{
+Calculate velocities of all 18 joints at all intervals.
+%}
 
 % Initialize angular velocity matrices for alpha, beta, and gamma
 alpha_ang_vel = zeros(6, size(t_cycle,2));
@@ -467,7 +477,11 @@ if plot_cycle_joint_velocities
     end
 end
 
-%% Q9
+%% Q9:
+%{
+According to the results of Questions 7 and 8, show a simulation (video) of the robot walking.
+Hint: Synchronize the motion of swing and supporting legs during the cycle.
+%}
 
 if plot_simulation
     % Simulate the robot moving
@@ -588,7 +602,3 @@ if plot_simulation
         end
     end
 end
-
-%% Q10
-
-% On other attachment
