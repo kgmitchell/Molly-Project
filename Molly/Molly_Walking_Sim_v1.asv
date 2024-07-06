@@ -1,7 +1,7 @@
 close all; clear all; clc;
 
 % Booleans to toggle plotting
-plot_6_step_pos_and_vel = true; % Needs to be true for part 6
+plot_6_step_pos_and_vel = false; % Needs to be true for part 6
 plot_11_step_pos_and_vel = false;
 plot_transfer_a_b_g = false;
 
@@ -23,6 +23,7 @@ body_l = 0.4; % m
 body_w = 0.2; % m
 body_h = 0.1; % m
 D = leg_lengths(1) + leg_lengths(2) + (body_w/2); % (Distance from foot tip to center of body from top view in standard position) NOT USED ANYWHERE
+num_legs = 4;
 
 % Q1: Average Velocity of Swing Phase Legs wrt the Body
 u_fb = duty / (1 - duty) * v; % m/s
@@ -117,7 +118,7 @@ if plot_6_step_pos_and_vel
     set(gca, 'xtick', 0:0.2:1);
     xlabel('Transfer Time')
     ylabel('X Position of Foot wrt Ground')
-    for point = 1:4
+    for point = 1:num_legs
         thisX = t_steps(point);
         thisY = x_pos_generic(point);
         labelstr = sprintf('(%.3f,%.3f)', thisX, thisY);
@@ -129,7 +130,7 @@ if plot_6_step_pos_and_vel
     set(gca, 'xtick', 0:0.2:1);
     xlabel('Transfer Time')
     ylabel('Z Position of Foot wrt Ground')
-    for point = 1:4
+    for point = 1:num_legs
         thisX = t_steps(point);
         thisY = z_pos_generic(point);
         labelstr = sprintf('(%.3f,%.3f)', thisX, thisY);
@@ -141,7 +142,7 @@ if plot_6_step_pos_and_vel
     set(gca, 'xtick', 0:0.2:1);
     xlabel('Transfer Time')
     ylabel('X Velocity of Foot wrt Ground')
-    for point = 1:4
+    for point = 1:num_legs
         thisX = t_steps(point);
         thisY = x_vel_generic(point);
         labelstr = sprintf('(%.3f,%.3f)', thisX, thisY);
@@ -153,7 +154,7 @@ if plot_6_step_pos_and_vel
     set(gca, 'xtick', 0:0.2:1);
     xlabel('Transfer Time')
     ylabel('Z Velocity of Foot wrt Ground')
-    for point = 1:4
+    for point = 1:num_legs
         thisX = t_steps(point);
         thisY = z_vel_generic(point);
         labelstr = sprintf('(%.3f,%.3f)', thisX, thisY);
@@ -280,14 +281,12 @@ leg1_joints = calc_joint_angles(1, x_pos_generic, z_pos_generic);
 leg2_joints = calc_joint_angles(2, x_pos_generic, z_pos_generic);
 leg3_joints = calc_joint_angles(3, x_pos_generic, z_pos_generic);
 leg4_joints = calc_joint_angles(4, x_pos_generic, z_pos_generic);
-leg5_joints = calc_joint_angles(5, x_pos_generic, z_pos_generic);
-leg6_joints = calc_joint_angles(6, x_pos_generic, z_pos_generic);
 
-leg_joints = [leg1_joints; leg2_joints; leg3_joints; leg4_joints; leg5_joints; leg6_joints];
+leg_joints = [leg1_joints; leg2_joints; leg3_joints; leg4_joints];
 
 % Plot legs' transfer phase alpha, beta, gamma
 if plot_transfer_a_b_g
-    for leg = 1:6 % for each leg
+    for leg = 1:num_legs % for each leg
         figure
         tiledlayout(1,3);
 
@@ -318,8 +317,8 @@ t_cycle = 0:0.1:T-0.1;
 transfer_start_time = phi_start * T; % start time of transfer phase of each leg in a total cycle
 
 % Initialize new cycle position matrices
-x_pos = zeros(6, 30);
-z_pos = zeros(6, 30);
+x_pos = zeros(num_legs, 30);
+z_pos = zeros(num_legs, 30);
 
 % Initialize support phase trajectories for x
 % Don't need z bc the value will be 0 if not in transfer anyway
@@ -353,20 +352,9 @@ x_pos(4,1:5) = x_pos_generic(6:10);
 z_pos(4,26:30) = z_pos_generic(1:5);
 z_pos(4,1:5) = z_pos_generic(6:10);
 
-% Leg 5:
-x_pos(5,11:30) = x_support_pos(1:20);
-x_pos(5,1:10) = x_pos_generic(1:10);
-z_pos(5,1:10) = z_pos_generic(1:10);
-
-% Leg 6:
-x_pos(6,26:30) = x_support_pos(1:5);
-x_pos(6,1:15) = x_support_pos(6:20);
-x_pos(6,16:25) = x_pos_generic(1:10);
-z_pos(6,16:25) = z_pos_generic(1:10);
-
 % Plot the legs' cycle positions
 if plot_cycle_pos
-    for leg = 1:6
+    for leg = 1:num_legs
         figure
         tiledlayout(2,1);
 
@@ -389,13 +377,11 @@ leg1_joints_cycle = calc_joint_angles(1, x_pos(1,:), z_pos(1,:));
 leg2_joints_cycle = calc_joint_angles(2, x_pos(2,:), z_pos(2,:));
 leg3_joints_cycle = calc_joint_angles(3, x_pos(3,:), z_pos(3,:));
 leg4_joints_cycle = calc_joint_angles(4, x_pos(4,:), z_pos(4,:));
-leg5_joints_cycle = calc_joint_angles(5, x_pos(5,:), z_pos(5,:));
-leg6_joints_cycle = calc_joint_angles(6, x_pos(6,:), z_pos(6,:));
 
-leg_joints_cycle = [leg1_joints_cycle; leg2_joints_cycle; leg3_joints_cycle; leg4_joints_cycle; leg5_joints_cycle; leg6_joints_cycle];
+leg_joints_cycle = [leg1_joints_cycle; leg2_joints_cycle; leg3_joints_cycle; leg4_joints_cycle];
 
 % Build master alpha, beta, gamma matrices
-for leg = 1:6
+for leg = 1:num_legs
     alpha(leg,:) = leg_joints_cycle(3*leg-2,:);
     beta(leg,:) = leg_joints_cycle(3*leg-1,:);
     gamma(leg,:) = leg_joints_cycle(3*leg,:);
@@ -403,7 +389,7 @@ end
 
 % Plot legs' transfer phase alpha, beta, gamma
 if plot_cycle_a_b_g
-    for leg = 1:6 % for each leg
+    for leg = 1:num_legs % for each leg
         figure
         tiledlayout(1,3);
 
@@ -437,7 +423,7 @@ alpha_ang_vel = zeros(6, size(t_cycle,2));
 beta_ang_vel = zeros(6, size(t_cycle,2));
 gamma_ang_vel = zeros(6, size(t_cycle,2));
 
-for leg = 1:6
+for leg = 1:num_legs
     for t = 1:size(t_cycle,2)
         if t == 1
             alpha_ang_vel(leg, t) = ((alpha(leg, t) - alpha(leg, end))/interval);
@@ -453,7 +439,7 @@ end
 
 % Plot joint angular velocities
 if plot_cycle_joint_velocities
-    for leg = 1:6 % for each leg
+    for leg = 1:num_legs % for each leg
         figure
         tiledlayout(1,3);
 
@@ -490,23 +476,31 @@ if plot_simulation
     % Initialize robot parts in starting configuration at t = 0
     body_origin(:,1) = [0; 0; 0];
 
-    hip(1:18,1) = [body_origin(1,1) + body_l/2; body_origin(2,1) + body_w/2; body_origin(3,1) + 0;
+    hip(1:12,1) = [body_origin(1,1) + body_l/2; body_origin(2,1) + body_w/2; body_origin(3,1) + 0;
                    body_origin(1,1) + body_l/2; body_origin(2,1) - body_w/2; body_origin(3,1) + 0;
-                   body_origin(1,1);            body_origin(2,1) + body_w/2; body_origin(3,1) + 0;
-                   body_origin(1,1);            body_origin(2,1) - body_w/2; body_origin(3,1) + 0;
+                   %body_origin(1,1);            body_origin(2,1) + body_w/2; body_origin(3,1) + 0;
+                   %body_origin(1,1);            body_origin(2,1) - body_w/2; body_origin(3,1) + 0;
                    body_origin(1,1) - body_l/2; body_origin(2,1) + body_w/2; body_origin(3,1) + 0;
                    body_origin(1,1) - body_l/2; body_origin(2,1) - body_w/2; body_origin(3,1) + 0];
 
-    knee(1:18,1) = hip(:,1);
-
-    ankle(1:18,1) = [knee(1,1) - leg_lengths(2)*sind(alpha(1,1))*cosd(beta(1,1)); knee(2,1) + leg_lengths(2)*cosd(alpha(1,1))*cosd(beta(1,1)); knee(3,1) + leg_lengths(2)*sind(beta(1,1));
+    knee(1:12,1) = hip(:,1);
+%{
+    ankle(1:16,1) = [knee(1,1) - leg_lengths(2)*sind(alpha(1,1))*cosd(beta(1,1)); knee(2,1) + leg_lengths(2)*cosd(alpha(1,1))*cosd(beta(1,1)); knee(3,1) + leg_lengths(2)*sind(beta(1,1));
                      knee(4,1) + leg_lengths(2)*sind(alpha(2,1))*cosd(beta(2,1)); knee(5,1) - leg_lengths(2)*cosd(alpha(2,1))*cosd(beta(2,1)); knee(6,1) + leg_lengths(2)*sind(beta(2,1));
                      knee(7,1) - leg_lengths(2)*sind(alpha(3,1))*cosd(beta(3,1)); knee(8,1) + leg_lengths(2)*cosd(alpha(3,1))*cosd(beta(3,1)); knee(9,1) + leg_lengths(2)*sind(beta(3,1));
                      knee(10,1) + leg_lengths(2)*sind(alpha(4,1))*cosd(beta(4,1)); knee(11,1) - leg_lengths(2)*cosd(alpha(4,1))*cosd(beta(4,1)); knee(12,1) + leg_lengths(2)*sind(beta(4,1));
                      knee(13,1) - leg_lengths(2)*sind(alpha(5,1))*cosd(beta(5,1)); knee(14,1) + leg_lengths(2)*cosd(alpha(5,1))*cosd(beta(5,1)); knee(15,1) + leg_lengths(2)*sind(beta(5,1));
                      knee(16,1) + leg_lengths(2)*sind(alpha(6,1))*cosd(beta(6,1)); knee(17,1) - leg_lengths(2)*cosd(alpha(6,1))*cosd(beta(6,1)); knee(18,1) + leg_lengths(2)*sind(beta(6,1))];
+%}
+    ankle(1:12,1) = [knee(1,1) - leg_lengths(2)*sind(alpha(1,1))*cosd(beta(1,1)); knee(2,1) + leg_lengths(2)*cosd(alpha(1,1))*cosd(beta(1,1)); knee(3,1) + leg_lengths(2)*sind(beta(1,1));
+                     knee(4,1) + leg_lengths(2)*sind(alpha(2,1))*cosd(beta(2,1)); knee(5,1) - leg_lengths(2)*cosd(alpha(2,1))*cosd(beta(2,1)); knee(6,1) + leg_lengths(2)*sind(beta(2,1));
+                     knee(7,1) - leg_lengths(2)*sind(alpha(3,1))*cosd(beta(3,1)); knee(8,1) + leg_lengths(2)*cosd(alpha(3,1))*cosd(beta(3,1)); knee(9,1) + leg_lengths(2)*sind(beta(3,1));
+                     knee(10,1) + leg_lengths(2)*sind(alpha(4,1))*cosd(beta(4,1)); knee(11,1) - leg_lengths(2)*cosd(alpha(4,1))*cosd(beta(4,1)); knee(12,1) + leg_lengths(2)*sind(beta(4,1));
+                     %knee(13,1) - leg_lengths(2)*sind(alpha(5,1))*cosd(beta(5,1)); knee(14,1) + leg_lengths(2)*cosd(alpha(5,1))*cosd(beta(5,1)); knee(15,1) + leg_lengths(2)*sind(beta(5,1));
+                     %knee(16,1) + leg_lengths(2)*sind(alpha(6,1))*cosd(beta(6,1)); knee(17,1) - leg_lengths(2)*cosd(alpha(6,1))*cosd(beta(6,1)); knee(18,1) + leg_lengths(2)*sind(beta(6,1))
+                     ];
 
-    foot(1:18,1) = [hip(1,1) + x_pos(1,1); hip(2,1) + 0.047; (hip(3,1) + z_pos(1,1)) - body_height;
+    foot(1:12,1) = [hip(1,1) + x_pos(1,1); hip(2,1) + 0.047; (hip(3,1) + z_pos(1,1)) - body_height;
                     hip(4,1) + x_pos(2,1); hip(5,1) - 0.047; (hip(6,1) + z_pos(2,1)) - body_height;
                     hip(7,1) + x_pos(3,1); hip(8,1) + 0.047; (hip(9,1) + z_pos(3,1)) - body_height;
                     hip(10,1) + x_pos(4,1); hip(11,1) - 0.047; (hip(12,1) + z_pos(4,1)) - body_height;

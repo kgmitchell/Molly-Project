@@ -1,13 +1,13 @@
 close all; clear all; clc;
 
 % Booleans to toggle plotting
-plot_6_step_pos_and_vel = true; % Needs to be true for part 6
-plot_11_step_pos_and_vel = true;
-plot_transfer_a_b_g = true;
+plot_6_step_pos_and_vel = false; % Needs to be true for part 6
+plot_11_step_pos_and_vel = false;
+plot_transfer_a_b_g = false;
 
-plot_cycle_pos = true; 
-plot_cycle_a_b_g = true; % Needs to be true for part 7
-plot_cycle_joint_velocities = true; % Needs to be true for part 8
+plot_cycle_pos = false; 
+plot_cycle_a_b_g = false; % Needs to be true for part 7
+plot_cycle_joint_velocities = false; % Needs to be true for part 8
 
 plot_simulation = true; % Needs to be true for part 9
 %% Problem 1
@@ -423,7 +423,7 @@ alpha_ang_vel = zeros(6, size(t_cycle,2));
 beta_ang_vel = zeros(6, size(t_cycle,2));
 gamma_ang_vel = zeros(6, size(t_cycle,2));
 
-for leg = 1:6
+for leg = 1:num_legs
     for t = 1:size(t_cycle,2)
         if t == 1
             alpha_ang_vel(leg, t) = ((alpha(leg, t) - alpha(leg, end))/interval);
@@ -439,7 +439,7 @@ end
 
 % Plot joint angular velocities
 if plot_cycle_joint_velocities
-    for leg = 1:6 % for each leg
+    for leg = 1:num_legs % for each leg
         figure
         tiledlayout(1,3);
 
@@ -476,28 +476,30 @@ if plot_simulation
     % Initialize robot parts in starting configuration at t = 0
     body_origin(:,1) = [0; 0; 0];
 
-    hip(1:18,1) = [body_origin(1,1) + body_l/2; body_origin(2,1) + body_w/2; body_origin(3,1) + 0;
+    hip(1:12,1) = [body_origin(1,1) + body_l/2; body_origin(2,1) + body_w/2; body_origin(3,1) + 0;
                    body_origin(1,1) + body_l/2; body_origin(2,1) - body_w/2; body_origin(3,1) + 0;
-                   body_origin(1,1);            body_origin(2,1) + body_w/2; body_origin(3,1) + 0;
-                   body_origin(1,1);            body_origin(2,1) - body_w/2; body_origin(3,1) + 0;
+                   %body_origin(1,1);            body_origin(2,1) + body_w/2; body_origin(3,1) + 0;
+                   %body_origin(1,1);            body_origin(2,1) - body_w/2; body_origin(3,1) + 0;
                    body_origin(1,1) - body_l/2; body_origin(2,1) + body_w/2; body_origin(3,1) + 0;
                    body_origin(1,1) - body_l/2; body_origin(2,1) - body_w/2; body_origin(3,1) + 0];
 
-    knee(1:18,1) = hip(:,1);
+    knee(1:12,1) = hip(:,1);
 
-    ankle(1:18,1) = [knee(1,1) - leg_lengths(2)*sind(alpha(1,1))*cosd(beta(1,1)); knee(2,1) + leg_lengths(2)*cosd(alpha(1,1))*cosd(beta(1,1)); knee(3,1) + leg_lengths(2)*sind(beta(1,1));
+    ankle(1:12,1) = [knee(1,1) - leg_lengths(2)*sind(alpha(1,1))*cosd(beta(1,1)); knee(2,1) + leg_lengths(2)*cosd(alpha(1,1))*cosd(beta(1,1)); knee(3,1) + leg_lengths(2)*sind(beta(1,1));
                      knee(4,1) + leg_lengths(2)*sind(alpha(2,1))*cosd(beta(2,1)); knee(5,1) - leg_lengths(2)*cosd(alpha(2,1))*cosd(beta(2,1)); knee(6,1) + leg_lengths(2)*sind(beta(2,1));
                      knee(7,1) - leg_lengths(2)*sind(alpha(3,1))*cosd(beta(3,1)); knee(8,1) + leg_lengths(2)*cosd(alpha(3,1))*cosd(beta(3,1)); knee(9,1) + leg_lengths(2)*sind(beta(3,1));
                      knee(10,1) + leg_lengths(2)*sind(alpha(4,1))*cosd(beta(4,1)); knee(11,1) - leg_lengths(2)*cosd(alpha(4,1))*cosd(beta(4,1)); knee(12,1) + leg_lengths(2)*sind(beta(4,1));
-                     knee(13,1) - leg_lengths(2)*sind(alpha(5,1))*cosd(beta(5,1)); knee(14,1) + leg_lengths(2)*cosd(alpha(5,1))*cosd(beta(5,1)); knee(15,1) + leg_lengths(2)*sind(beta(5,1));
-                     knee(16,1) + leg_lengths(2)*sind(alpha(6,1))*cosd(beta(6,1)); knee(17,1) - leg_lengths(2)*cosd(alpha(6,1))*cosd(beta(6,1)); knee(18,1) + leg_lengths(2)*sind(beta(6,1))];
+                     %knee(13,1) - leg_lengths(2)*sind(alpha(5,1))*cosd(beta(5,1)); knee(14,1) + leg_lengths(2)*cosd(alpha(5,1))*cosd(beta(5,1)); knee(15,1) + leg_lengths(2)*sind(beta(5,1));
+                     %knee(16,1) + leg_lengths(2)*sind(alpha(6,1))*cosd(beta(6,1)); knee(17,1) - leg_lengths(2)*cosd(alpha(6,1))*cosd(beta(6,1)); knee(18,1) + leg_lengths(2)*sind(beta(6,1))
+                     ];
 
-    foot(1:18,1) = [hip(1,1) + x_pos(1,1); hip(2,1) + 0.047; (hip(3,1) + z_pos(1,1)) - body_height;
+    foot(1:12,1) = [hip(1,1) + x_pos(1,1); hip(2,1) + 0.047; (hip(3,1) + z_pos(1,1)) - body_height;
                     hip(4,1) + x_pos(2,1); hip(5,1) - 0.047; (hip(6,1) + z_pos(2,1)) - body_height;
                     hip(7,1) + x_pos(3,1); hip(8,1) + 0.047; (hip(9,1) + z_pos(3,1)) - body_height;
                     hip(10,1) + x_pos(4,1); hip(11,1) - 0.047; (hip(12,1) + z_pos(4,1)) - body_height;
-                    hip(13,1) + x_pos(5,1); hip(14,1) + 0.047; (hip(15,1) + z_pos(5,1)) - body_height;
-                    hip(16,1) + x_pos(6,1); hip(17,1) - 0.047; (hip(18,1) + z_pos(6,1)) - body_height];
+                    %hip(13,1) + x_pos(5,1); hip(14,1) + 0.047; (hip(15,1) + z_pos(5,1)) - body_height;
+                    %hip(16,1) + x_pos(6,1); hip(17,1) - 0.047; (hip(18,1) + z_pos(6,1)) - body_height
+                    ];
 
     % Initial Plot
     num_cycles = 10;
@@ -512,7 +514,7 @@ if plot_simulation
     zlim([(-body_height) body_h/2])
     zlabel('z-axis')
 
-    for leg = 1:6
+    for leg = 1:num_legs
         O_h(leg) = quiver3(body_origin(1,1), body_origin(2,1), body_origin(3,1), hip(3*leg-2,1) - body_origin(1,1), hip(3*leg-1,1) - body_origin(2,1), hip(3*leg,1) - body_origin(3,1), 'off', '-k', 'ShowArrowHead', 'off');
         h_a(leg) = quiver3(hip(3*leg-2,1), hip(3*leg-1,1), hip(3*leg,1), ankle(3*leg-2,1) - hip(3*leg-2,1), ankle(3*leg-1,1) - hip(3*leg-1,1), ankle(3*leg,1) - hip(3*leg,1), 'off', '-k', 'ShowArrowHead', 'off');
         a_f(leg) = quiver3(ankle(3*leg-2,1), ankle(3*leg-1,1), ankle(3*leg,1), foot(3*leg-2,1) - ankle(3*leg-2,1), foot(3*leg-1,1) - ankle(3*leg-1,1), foot(3*leg,1), 'off', '-k', 'ShowArrowHead', 'off');
@@ -535,33 +537,35 @@ if plot_simulation
                 body_origin(1,t) = body_origin(1,t-1) + v*interval;
             end
 
-            hip(1:18,t) = [body_origin(1,t) + body_l/2; body_origin(2,t) + body_w/2; body_origin(3,t) + 0;
+            hip(1:12,t) = [body_origin(1,t) + body_l/2; body_origin(2,t) + body_w/2; body_origin(3,t) + 0;
                            body_origin(1,t) + body_l/2; body_origin(2,t) - body_w/2; body_origin(3,t) + 0;
-                           body_origin(1,t);            body_origin(2,t) + body_w/2; body_origin(3,t) + 0;
-                           body_origin(1,t);            body_origin(2,t) - body_w/2; body_origin(3,t) + 0;
+                           %body_origin(1,t);            body_origin(2,t) + body_w/2; body_origin(3,t) + 0;
+                           %body_origin(1,t);            body_origin(2,t) - body_w/2; body_origin(3,t) + 0;
                            body_origin(1,t) - body_l/2; body_origin(2,t) + body_w/2; body_origin(3,t) + 0;
                            body_origin(1,t) - body_l/2; body_origin(2,t) - body_w/2; body_origin(3,t) + 0];
             
             knee(:,t) = hip(:,t);
 
-            ankle(1:18,t) = [knee(1,t) - leg_lengths(2)*sind(alpha(1,t))*cosd(beta(1,t)); knee(2,t) + leg_lengths(2)*cosd(alpha(1,t))*cosd(beta(1,1)); knee(3,t) + leg_lengths(2)*sind(beta(1,t));
+            ankle(1:12,t) = [knee(1,t) - leg_lengths(2)*sind(alpha(1,t))*cosd(beta(1,t)); knee(2,t) + leg_lengths(2)*cosd(alpha(1,t))*cosd(beta(1,1)); knee(3,t) + leg_lengths(2)*sind(beta(1,t));
                              knee(4,t) + leg_lengths(2)*sind(alpha(2,t))*cosd(beta(2,t)); knee(5,t) - leg_lengths(2)*cosd(alpha(2,t))*cosd(beta(2,1)); knee(6,t) + leg_lengths(2)*sind(beta(2,t));
                              knee(7,t) - leg_lengths(2)*sind(alpha(3,t))*cosd(beta(3,t)); knee(8,t) + leg_lengths(2)*cosd(alpha(3,t))*cosd(beta(3,1)); knee(9,t) + leg_lengths(2)*sind(beta(3,t));
                              knee(10,t) + leg_lengths(2)*sind(alpha(4,t))*cosd(beta(4,t)); knee(11,t) - leg_lengths(2)*cosd(alpha(4,t))*cosd(beta(4,1)); knee(12,t) + leg_lengths(2)*sind(beta(4,t));
-                             knee(13,t) - leg_lengths(2)*sind(alpha(5,t))*cosd(beta(5,t)); knee(14,t) + leg_lengths(2)*cosd(alpha(5,t))*cosd(beta(5,1)); knee(15,t) + leg_lengths(2)*sind(beta(5,t));
-                             knee(16,t) + leg_lengths(2)*sind(alpha(6,t))*cosd(beta(6,t)); knee(17,t) - leg_lengths(2)*cosd(alpha(6,t))*cosd(beta(6,1)); knee(18,t) + leg_lengths(2)*sind(beta(6,t))];
+                             %knee(13,t) - leg_lengths(2)*sind(alpha(5,t))*cosd(beta(5,t)); knee(14,t) + leg_lengths(2)*cosd(alpha(5,t))*cosd(beta(5,1)); knee(15,t) + leg_lengths(2)*sind(beta(5,t));
+                             %knee(16,t) + leg_lengths(2)*sind(alpha(6,t))*cosd(beta(6,t)); knee(17,t) - leg_lengths(2)*cosd(alpha(6,t))*cosd(beta(6,1)); knee(18,t) + leg_lengths(2)*sind(beta(6,t))
+                             ];
 
-            foot(1:18,t) = [hip(1,t) + x_pos(1,t); hip(2,t) + 0.047; (hip(3,t) + z_pos(1,t)) - body_height;
+            foot(1:12,t) = [hip(1,t) + x_pos(1,t); hip(2,t) + 0.047; (hip(3,t) + z_pos(1,t)) - body_height;
                             hip(4,t) + x_pos(2,t); hip(5,t) - 0.047; (hip(6,t) + z_pos(2,t)) - body_height;
                             hip(7,t) + x_pos(3,t); hip(8,t) + 0.047; (hip(9,t) + z_pos(3,t)) - body_height;
                             hip(10,t) + x_pos(4,t); hip(11,t) - 0.047; (hip(12,t) + z_pos(4,t)) - body_height;
-                            hip(13,t) + x_pos(5,t); hip(14,t) + 0.047; (hip(15,t) + z_pos(5,t)) - body_height;
-                            hip(16,t) + x_pos(6,t)-0.001; hip(17,t) - 0.047; (hip(18,t) + z_pos(6,t)) - body_height];
+                            %hip(13,t) + x_pos(5,t); hip(14,t) + 0.047; (hip(15,t) + z_pos(5,t)) - body_height;
+                            %hip(16,t) + x_pos(6,t)-0.001; hip(17,t) - 0.047; (hip(18,t) + z_pos(6,t)) - body_height
+                            ];
 
             % Replot
             hold on
 
-            for leg = 1:6
+            for leg = 1:num_legs
                 O_h(leg).XData = body_origin(1,t);
                 O_h(leg).YData = body_origin(2,t);
                 O_h(leg).ZData = body_origin(3,t);
