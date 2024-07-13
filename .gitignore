@@ -1,0 +1,5 @@
+# Temporary Solidworks folders
+*/*~$*
+
+# Solidworks backup files
+*.sldbak
